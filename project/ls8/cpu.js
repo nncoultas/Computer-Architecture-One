@@ -4,6 +4,7 @@
 const HLT = 0b00000001;
 const LDI = 0b10011001;
 const PRN = 0b01000011;
+const MUL = 0b10101010;
 /**
  * Class for simulating a simple Computer (CPU & memory)
  */
@@ -57,6 +58,7 @@ class CPU {
     switch (op) {
       case 'MUL':
         // !!! IMPLEMENT ME
+        this.reg[regA] = this.reg[regA] * this.reg[regB];
         break;
     }
   }
@@ -93,6 +95,9 @@ class CPU {
         break;
       case LDI:
         this.reg[operandA] = operandB;
+        break;
+      case MUL:
+        this.alu('MUL', operandA, operandB);
         break;
       case PRN:
         console.log(this.reg[operandA]);
