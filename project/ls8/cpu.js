@@ -5,6 +5,8 @@ const HLT = 0b00000001;
 const LDI = 0b10011001;
 const PRN = 0b01000011;
 const MUL = 0b10101010;
+const POP = 0b01001100;
+const PUSH = 0b01001101;
 /**
  * Class for simulating a simple Computer (CPU & memory)
  */
@@ -104,6 +106,8 @@ class CPU {
     //     break;
     // }
 
+    let SP = 0x07;
+
     const handle_LDI = (operandA, operandB) => {
       this.reg[operandA] = operandB;
     };
@@ -116,12 +120,22 @@ class CPU {
     const handle_HLT = () => {
       this.stopClock();
     };
+    const handle_POP = operA => {
+      this.reg[operA] = this.ram.read(this.reg[SP]);
+      this.reg[SP]++;
+    };
+    const handle_PUSH = operA => {
+      this.reg[SP] = this.reg[SP] - 1;
+      this.ram.write(this.reg[SP], this.reg[operA]);
+    };
 
     const branchTable = {
       [LDI]: handle_LDI,
       [MUL]: handle_MUL,
       [PRN]: handle_PRN,
-      [HLT]: handle_HLT
+      [HLT]: handle_HLT,
+      [POP]: handle_POP,
+      [PUSH]: handle_PUSH
     };
 
     branchTable[IR](operandA, operandB);
