@@ -89,21 +89,42 @@ class CPU {
     // outlined in the LS-8 spec.
 
     // !!! IMPLEMENT ME
-    switch (IR) {
-      case HLT:
-        this.stopClock();
-        break;
-      case LDI:
-        this.reg[operandA] = operandB;
-        break;
-      case MUL:
-        this.alu('MUL', operandA, operandB);
-        break;
-      case PRN:
-        console.log(this.reg[operandA]);
-        break;
-    }
+    // switch (IR) {
+    //   case HLT:
+    //     this.stopClock();
+    //     break;
+    //   case LDI:
+    //     this.reg[operandA] = operandB;
+    //     break;
+    //   case MUL:
+    //     this.alu('MUL', operandA, operandB);
+    //     break;
+    //   case PRN:
+    //     console.log(this.reg[operandA]);
+    //     break;
+    // }
 
+    const handle_LDI = (operandA, operandB) => {
+      this.reg[operandA] = operandB;
+    };
+    const handle_MUL = (operandA, operandB) => {
+      this.alu('MUL', operandA, operandB);
+    };
+    const handle_PRN = operandA => {
+      console.log(this.reg[operandA]);
+    };
+    const handle_HLT = () => {
+      this.stopClock();
+    };
+
+    const branchTable = {
+      [LDI]: handle_LDI,
+      [MUL]: handle_MUL,
+      [PRN]: handle_PRN,
+      [HLT]: handle_HLT
+    };
+
+    branchTable[IR](operandA, operandB);
     // Increment the PC register to go to the next instruction. Instructions
     // can be 1, 2, or 3 bytes long. Hint: the high 2 bits of the
     // instruction byte tells you how many bytes follow the instruction byte
