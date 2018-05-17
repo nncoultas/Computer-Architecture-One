@@ -1,3 +1,22 @@
+Skip to content
+This repository
+Search
+Pull requests
+Issues
+Marketplace
+Explore
+ @habib1234731
+Sign out
+1
+0 218 nncoultas/Computer-Architecture-One
+forked from LambdaSchool/Computer-Architecture-One
+ Code  Pull requests 0  Projects 0  Wiki  Insights
+Computer-Architecture-One/project/ls8/cpu.js
+808da35  2 days ago
+@nncoultas nncoultas module 2 complete
+@nncoultas @beejjorgensen
+      
+180 lines (160 sloc)  4.33 KB
 /**
  * LS-8 v2.0 emulator skeleton code
  */
@@ -11,15 +30,6 @@ const PUSH = 0b01001101;
 const CALL = 0b01001000;
 const RET = 0b00001001;
 const ADD = 0b10101000;
-const CMP = 0b10100000;
-const JMP = 0b01010000;
-
-// Flag Values
-
-const EQF = 0;
-const GTF = 1;
-const LTF = 2;
-
 /**
  * Class for simulating a simple Computer (CPU & memory)
  */
@@ -34,22 +44,8 @@ class CPU {
 
     // Special-purpose registers
     this.PC = 0; // Program Counter
-    this.reg.FL = 0; // Flags
+
     this.reg[SP] = 0xf4;
-  }
-
-  setFlag(flag, value) {
-    v = +v; // convert true to 1 and false to 0
-
-    if (value) {
-      this.reg.FL |= 1 << flag;
-    } else {
-      this.reg.FL &= ~(1 << flag);
-    }
-  }
-
-  getFlag(flag) {
-    return (this.reg.FL & (1 << flag)) >> flag;
   }
 
   /**
@@ -87,17 +83,12 @@ class CPU {
    */
   alu(op, regA, regB) {
     switch (op) {
-      case "MUL":
+      case 'MUL':
         // !!! IMPLEMENT ME
         this.reg[regA] = this.reg[regA] * this.reg[regB];
         break;
-      case "ADD":
+      case 'ADD':
         this.reg[regA] = this.reg[regA] + this.reg[regB];
-        break;
-      case "CMP":
-        this.setFlag(EQF, this.reg[regA] === this.reg[regB]);
-        this.setFlag(GTF, this.reg[regA] > this.reg[regB]);
-        this.setFlag(LTF, this.reg[regA] < this.reg[regB]);
         break;
     }
   }
@@ -147,7 +138,7 @@ class CPU {
       this.reg[operandA] = operandB;
     };
     const handle_MUL = (operandA, operandB) => {
-      this.alu("MUL", operandA, operandB);
+      this.alu('MUL', operandA, operandB);
     };
     const handle_PRN = operandA => {
       console.log(this.reg[operandA]);
@@ -164,7 +155,7 @@ class CPU {
       this.ram.write(this.reg[SP], this.reg[operA]);
     };
     const handle_ADD = (operandA, operandB) => {
-      this.alu("ADD", operandA, operandB);
+      this.alu('ADD', operandA, operandB);
     };
     const handle_CALL = operA => {
       this.reg[SP] = this.reg[SP] - 1;
@@ -176,12 +167,6 @@ class CPU {
       this.reg[SP]++;
       return value;
     };
-    const handle_CMP = () => {
-      this.alu("CMP", operandA, operandB);
-    };
-    const handle_JMP = () => {
-      jmpHandler = this.reg[operandA];
-    };
 
     const branchTable = {
       [LDI]: handle_LDI,
@@ -192,9 +177,7 @@ class CPU {
       [PUSH]: handle_PUSH,
       [ADD]: handle_ADD,
       [CALL]: handle_CALL,
-      [RET]: handle_RET,
-      [CMP]: handle_CMP,
-      [JMP]: handle_JMP
+      [RET]: handle_RET
     };
 
     const returnHandler = branchTable[IR](operandA, operandB);
@@ -204,14 +187,25 @@ class CPU {
     // for any particular instruction.
 
     // !!! IMPLEMENT ME
-    if (returnHandler) {
-      this.PC = returnHandler;
-    } else if (jmpHandler) {
-      this.PC = jmpHandler;
-    } else {
+    if (returnHandler === undefined) {
       this.PC += (IR >>> 6) + 1;
+    } else {
+      this.PC = returnHandler;
     }
   }
 }
 
 module.exports = CPU;
+© 2018 GitHub, Inc.
+Terms
+Privacy
+Security
+Status
+Help
+Contact GitHub
+API
+Training
+Shop
+Blog
+About
+Press h to open a hovercard with more details.
