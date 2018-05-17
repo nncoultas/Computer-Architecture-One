@@ -1,12 +1,25 @@
 /**
  * LS-8 v2.0 emulator skeleton code
  */
+let SP = 0x07;
 const HLT = 0b00000001;
 const LDI = 0b10011001;
 const PRN = 0b01000011;
 const MUL = 0b10101010;
 const POP = 0b01001100;
 const PUSH = 0b01001101;
+const CALL = 0b01001000;
+const RET = 0b00001001;
+const ADD = 0b10101000;
+const CMP = 0b10100000;
+const JMP = 0b01010000;
+
+// Flag Values
+
+const EQF = 0;
+const GTF = 1;
+const LTF = 2;
+
 /**
  * Class for simulating a simple Computer (CPU & memory)
  */
@@ -21,6 +34,22 @@ class CPU {
 
     // Special-purpose registers
     this.PC = 0; // Program Counter
+    this.reg.FL = 0; // Flags
+    this.reg[SP] = 0xf4;
+  }
+
+  setFlag(flag, value) {
+    v = +v; // convert true to 1 and false to 0
+
+    if (value) {
+      this.reg.FL |= 1 << flag;
+    } else {
+      this.reg.FL &= ~(1 << flag);
+    }
+  }
+
+  getFlag(flag) {
+    return (this.reg.FL & (1 << flag)) >> flag;
   }
 
   /**
@@ -58,9 +87,17 @@ class CPU {
    */
   alu(op, regA, regB) {
     switch (op) {
-      case 'MUL':
+      case "MUL":
         // !!! IMPLEMENT ME
         this.reg[regA] = this.reg[regA] * this.reg[regB];
+        break;
+      case "ADD":
+        this.reg[regA] = this.reg[regA] + this.reg[regB];
+        break;
+      case "CMP":
+        this.setFlag(EQF, this.reg[regA] === this.reg[regB]);
+        this.setFlag(GTF, this.reg[regA] > this.reg[regB]);
+        this.setFlag(LTF, this.reg[regA] < this.reg[regB]);
         break;
     }
   }
@@ -106,13 +143,11 @@ class CPU {
     //     break;
     // }
 
-    let SP = 0x07;
-
     const handle_LDI = (operandA, operandB) => {
       this.reg[operandA] = operandB;
     };
     const handle_MUL = (operandA, operandB) => {
-      this.alu('MUL', operandA, operandB);
+      this.alu("MUL", operandA, operandB);
     };
     const handle_PRN = operandA => {
       console.log(this.reg[operandA]);
@@ -128,6 +163,25 @@ class CPU {
       this.reg[SP] = this.reg[SP] - 1;
       this.ram.write(this.reg[SP], this.reg[operA]);
     };
+    const handle_ADD = (operandA, operandB) => {
+      this.alu("ADD", operandA, operandB);
+    };
+    const handle_CALL = operA => {
+      this.reg[SP] = this.reg[SP] - 1;
+      this.ram.write(this.reg[SP], this.PC + 2);
+      return this.reg[operA];
+    };
+    const handle_RET = () => {
+      const value = this.ram.read(this.reg[SP]);
+      this.reg[SP]++;
+      return value;
+    };
+    const handle_CMP = () => {
+      this.alu("CMP", operandA, operandB);
+    };
+    const handle_JMP = () => {
+      jmpHandler = this.reg[operandA];
+    };
 
     const branchTable = {
       [LDI]: handle_LDI,
@@ -135,17 +189,28 @@ class CPU {
       [PRN]: handle_PRN,
       [HLT]: handle_HLT,
       [POP]: handle_POP,
-      [PUSH]: handle_PUSH
+      [PUSH]: handle_PUSH,
+      [ADD]: handle_ADD,
+      [CALL]: handle_CALL,
+      [RET]: handle_RET,
+      [CMP]: handle_CMP,
+      [JMP]: handle_JMP
     };
 
-    branchTable[IR](operandA, operandB);
+    const returnHandler = branchTable[IR](operandA, operandB);
     // Increment the PC register to go to the next instruction. Instructions
     // can be 1, 2, or 3 bytes long. Hint: the high 2 bits of the
     // instruction byte tells you how many bytes follow the instruction byte
     // for any particular instruction.
 
     // !!! IMPLEMENT ME
-    this.PC += (IR >>> 6) + 1;
+    if (returnHandler) {
+      this.PC = returnHandler;
+    } else if (jmpHandler) {
+      this.PC = jmpHandler;
+    } else {
+      this.PC += (IR >>> 6) + 1;
+    }
   }
 }
 
