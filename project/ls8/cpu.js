@@ -1,22 +1,3 @@
-Skip to content
-This repository
-Search
-Pull requests
-Issues
-Marketplace
-Explore
- @habib1234731
-Sign out
-1
-0 218 nncoultas/Computer-Architecture-One
-forked from LambdaSchool/Computer-Architecture-One
- Code  Pull requests 0  Projects 0  Wiki  Insights
-Computer-Architecture-One/project/ls8/cpu.js
-808da35  2 days ago
-@nncoultas nncoultas module 2 complete
-@nncoultas @beejjorgensen
-      
-180 lines (160 sloc)  4.33 KB
 /**
  * LS-8 v2.0 emulator skeleton code
  */
@@ -196,16 +177,3 @@ class CPU {
 }
 
 module.exports = CPU;
-© 2018 GitHub, Inc.
-Terms
-Privacy
-Security
-Status
-Help
-Contact GitHub
-API
-Training
-Shop
-Blog
-About
-Press h to open a hovercard with more details.
